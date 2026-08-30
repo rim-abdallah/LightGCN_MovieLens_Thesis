@@ -18,3 +18,8 @@ tensorboard/
 
 Thumbs.db
 .DS_Store
+
+Data/
+Shared/
+plots/
+LightGCN_movieLens/
