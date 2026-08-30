@@ -1,112 +1,203 @@
-# LightGCN
-This is our Tensorflow implementation for our SIGIR 2020 paper:
+Community-Aware LightGCN for Coded Caching
 
->Xiangnan He, Kuan Deng ,Xiang Wang, Yan Li, Yongdong Zhang, Meng Wang(2020). LightGCN: Simplifying and Powering Graph Convolution Network for Recommendation, [Paper in arXiv](https://arxiv.org/abs/2002.02126).
+This repository contains code developed and adapted for a Master's thesis on community-aware cache placement with heterogeneous user demand.
 
-Contributors: Dr. Xiangnan He (staff.ustc.edu.cn/~hexn/), Kuan Deng, Yingxin Wu.
+The project uses LightGCN to learn user-item preferences from MovieLens interactions. The learned preference scores are then used to build user-specific request distributions, detect user communities, construct global and community-level popularity distributions, and prepare inputs for coded-caching experiments.
 
-(We also provide Pytorch implementation for LightGCN : https://github.com/gusye1234/LightGCN-PyTorch. Contributors: Jianbai Ye.)
+Project overview
 
-## Introduction
-In this work, we aim to simplify the design of GCN to make it more concise and appropriate for recommendation. We propose a new model named LightGCN, including only the most essential component in GCN—neighborhood aggregation—for collaborative filtering.
+The main workflow is:
 
-## Environment Requirement
-The code has been tested running under Python 3.6.5. The required packages are as follows:
-* tensorflow == 1.11.0
-* numpy == 1.14.3
-* scipy == 1.1.0
-* sklearn == 0.19.1
-* cython == 0.29.15
-## C++ evaluator
-We have implemented C++ code to output metrics during and after training, which is much more efficient than python evaluator. It needs to be compiled first using the following command. 
-```
-python setup.py build_ext --inplace
-```
-After compilation, the C++ code will run by default instead of Python code.
+Preprocess the MovieLens dataset.
 
-## Examples to run a 3-layer LightGCN
-The instruction of commands has been clearly stated in the codes (see the parser function in LightGCN/utility/parser.py).
-### Gowalla dataset
-* Command
-```
-python LightGCN.py --dataset gowalla --regs [1e-4] --embed_size 64 --layer_size [64,64,64] --lr 0.001 --batch_size 2048 --epoch 1000
-```
-* Output log :
-```
-eval_score_matrix_foldout with cpp
-n_users=29858, n_items=40981
-n_interactions=1027370
-n_train=810128, n_test=217242, sparsity=0.00084
-      ...
-Epoch 1 [30.3s]: train==[0.46925=0.46911 + 0.00014]
-Epoch 2 [27.1s]: train==[0.21866=0.21817 + 0.00048]
-      ...
-Epoch 879 [81.6s + 31.3s]: test==[0.13271=0.12645 + 0.00626 + 0.00000], recall=[0.18201], precision=[0.05601], ndcg=[0.15555]
-Early stopping is trigger at step: 5 log:0.18201370537281036
-Best Iter=[38]@[32829.6]	recall=[0.18236], precision=[0.05607], ndcg=[0.15539]
-```
+Train LightGCN on user-movie interactions.
 
+Export user-item scores and convert them into user preference distributions.
 
-### Yelp2018 dataset
-* Command
-```
-python LightGCN.py --dataset yelp2018 --regs [1e-4] --embed_size 64 --layer_size [64,64,64] --lr 0.001 --batch_size 2048 --epoch 1000
-```
-* Output log :
-```
-eval_score_matrix_foldout with cpp
-n_users=31668, n_items=38048
-n_interactions=1561406
-n_train=1237259, n_test=324147, sparsity=0.00130
-    ...
-Epoch 1 [56.5s]: train==[0.33843=0.33815 + 0.00028]
-Epoch 2 [53.1s]: train==[0.16253=0.16192 + 0.00061]
-    ...
-Epoch 679 [104.6s + 12.9s]: test==[0.17217=0.16289 + 0.00929 + 0.00000], recall=[0.06359], precision=[0.02874], ndcg=[0.05240]
-Early stopping is trigger at step: 5 log:0.06359195709228516
-Best Iter=[28]@[42815.0]	recall=[0.06367], precision=[0.02868], ndcg=[0.05236]
-```
-### Amazon-book dataset
-* Command
-```
-python LightGCN.py --dataset amazon-book --regs [1e-4] --embed_size 64 --layer_size [64,64,64] --lr 0.001 --batch_size 8192 --epoch 1000
-```
-* Output log :
-```
-eval_score_matrix_foldout with cpp
-n_users=52643, n_items=91599
-n_interactions=2984108
-n_train=2380730, n_test=603378, sparsity=0.00062
-    ...
-Epoch 1 [53.2s]: train==[0.57471=0.57463 + 0.00008]
-Epoch 2 [47.3s]: train==[0.31518=0.31478 + 0.00040]
-    ...
-Epoch 779 [181.7s + 79.0s]: test==[0.20300=0.19434 + 0.00866 + 0.00000], recall=[0.04120], precision=[0.01703], ndcg=[0.03186]
-Early stopping is trigger at step: 5 log:0.04119725897908211
-Best Iter=[33]@[49875.4]	recall=[0.04123], precision=[0.01710], ndcg=[0.03189]
-```
-NOTE : the duration of training and testing depends on the running environment.
-## Dataset
-We provide three processed datasets: Gowalla, Yelp2018 and Amazon-book.
-* `train.txt`
-  * Train file.
-  * Each line is a user with her/his positive interactions with items: userID\t a list of itemID\n.
+Build a user similarity graph.
 
-* `test.txt`
-  * Test file (positive instances).
-  * Each line is a user with her/his positive interactions with items: userID\t a list of itemID\n.
-  * Note that here we treat all unobserved interactions as the negative instances when reporting performance.
-  
-* `user_list.txt`
-  * User file.
-  * Each line is a triplet (org_id, remap_id) for one user, where org_id and remap_id represent the ID of the user in the original and our datasets, respectively.
-  
-* `item_list.txt`
-  * Item file.
-  * Each line is a triplet (org_id, remap_id) for one item, where org_id and remap_id represent the ID of the item in the original and our datasets, respectively.
+Detect user communities using Louvain community detection.
 
-## Efficiency Improvements:
-  * Parallelized sampling on CPU
-  * C++ evaluation for top-k recommendation
+Construct different cache-placement distributions:
 
-=======
+individual user preference;
+
+global popularity across users;
+
+community-level popularity;
+
+hybrid distributions controlled by an alpha parameter.
+
+Prepare data for coded-caching experiments.
+
+Analyze and visualize the resulting distributions and experiment outputs.
+
+Dataset
+
+This project uses MovieLens Latest Small (ml-latest-small), provided by the GroupLens Research group at the University of Minnesota.
+
+The dataset contains:
+
+610 users
+
+9,742 movies
+
+100,836 ratings
+
+ratings collected between March 1996 and September 2018
+
+MovieLens dataset page:
+
+https://grouplens.org/datasets/movielens/latest/
+
+Direct download:
+
+https://files.grouplens.org/datasets/movielens/ml-latest-small.zip
+
+Dataset documentation:
+
+https://files.grouplens.org/datasets/movielens/ml-latest-small-README.html
+
+The MovieLens dataset is not included in this repository. It should be downloaded directly from GroupLens and used according to the dataset's terms of use.
+
+MovieLens citation
+
+If using the MovieLens dataset in academic work, please cite:
+
+F. Maxwell Harper and Joseph A. Konstan. 2015.
+The MovieLens Datasets: History and Context.
+ACM Transactions on Interactive Intelligent Systems (TiiS), 5(4), Article 19.
+https://doi.org/10.1145/2827872
+
+LightGCN
+
+The recommendation component of this project is based on the original TensorFlow implementation of LightGCN.
+
+Original repository:
+
+https://github.com/kuandeng/LightGCN
+
+LightGCN paper:
+
+Xiangnan He, Kuan Deng, Xiang Wang, Yan Li, Yongdong Zhang, and Meng Wang. 2020.
+LightGCN: Simplifying and Powering Graph Convolution Network for Recommendation.
+Proceedings of SIGIR 2020.
+
+Paper:
+
+https://arxiv.org/abs/2002.02126
+
+The original LightGCN implementation was adapted for the MovieLens-based workflow used in this thesis. Additional scripts were developed for preprocessing, preference extraction, community detection, caching-distribution construction, experiment preparation, and result analysis.
+
+Repository structure
+
+LightGCN_MovieLens_Thesis/
+│
+├── LightGCN.py
+├── setup.py
+├── sampling_utils.py
+├── alpha_experiment.py
+├── cachegain.py
+├── dist.py
+├── random_item.py
+│
+├── preprocessing/
+│   ├── preprocess_movielens.py
+│   └── create_random_movielens_subset.py
+│
+├── community/
+│   ├── louvain.py
+│   ├── top_k.py
+│   └── change_user_id.py
+│
+├── community_setup/
+│   ├── prep.py
+│   └── similarity_com.py
+│
+├── zipf/
+│   ├── com_zipf.py
+│   ├── create_topk_probabilities.py
+│   ├── make_zipf_probabilities.py
+│   └── remove_zero.py
+│
+├── average/
+│   ├── average_folder.py
+│   └── calculate_averages.py
+│
+├── visualization/
+│   ├── export_scores_matrix.py
+│   ├── global_vs_user_dist.py
+│   ├── heatmap.py
+│   ├── plot_community_heatmap.py
+│   ├── plot_random_users_distribution.py
+│   ├── plot_training_results.py
+│   ├── visualize_interest_graph.py
+│   ├── visualize_lightgcn_bipartite.py
+│   ├── visualize_louvain_communities.py
+│   └── visualize_user_ranking.py
+│
+├── utility/
+│
+└── evaluator/
+
+Data and experiment files
+
+Large datasets, generated CSV files, experiment outputs, and plots are intentionally excluded from GitHub.
+
+The repository is intended to store the source code, while generated data and simulation results remain local.
+
+In particular, directories such as Data/, Shared/, and plots/, together with generated CSV and Excel files, are excluded through .gitignore.
+
+Main components
+
+MovieLens preprocessing
+
+Scripts in preprocessing/ prepare MovieLens interactions for the LightGCN training pipeline.
+
+User preference learning
+
+LightGCN.py trains the recommendation model and produces user-item representations and recommendation scores.
+
+These scores are used to derive a probability distribution over movies for each user.
+
+Community detection
+
+Scripts in community/ and community_setup/ construct user similarity information and apply Louvain community detection.
+
+The detected communities are used to compare cache-placement strategies based on:
+
+individual user preferences;
+
+overall global popularity;
+
+community-level popularity.
+
+Caching experiments
+
+The project contains scripts for preparing probability distributions and experiment configurations used by the coded-caching simulator.
+
+Hybrid cache placement is also considered by combining individual preference and global or community popularity using an alpha parameter.
+
+Visualization and analysis
+
+Scripts in visualization/ and average/ are used to inspect learned user distributions, communities, experiment results, and averaged performance metrics.
+
+Notes
+
+Some scripts use local file paths for experiment inputs and outputs. These paths may need to be changed before running the project on another machine.
+
+Generated datasets and experiment results are not version-controlled in this repository.
+
+Acknowledgments
+
+This work builds on the LightGCN implementation by Xiangnan He, Kuan Deng, Yingxin Wu, and the other contributors to the original LightGCN project.
+
+MovieLens data are provided by the GroupLens Research group at the University of Minnesota.
+
+References
+
+X. He, K. Deng, X. Wang, Y. Li, Y. Zhang, and M. Wang,
+LightGCN: Simplifying and Powering Graph Convolution Network for Recommendation, SIGIR 2020.
+
+F. M. Harper and J. A. Konstan,
+The MovieLens Datasets: History and Context, ACM Transactions on Interactive Intelligent Systems, 2015.
