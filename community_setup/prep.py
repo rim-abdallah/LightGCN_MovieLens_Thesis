@@ -29,8 +29,80 @@ COMMUNITIES = [
             r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\com\request\requests_com_3.csv"
         ),
     },
+    # {
+    #             "name": "community_0",
+    #             "probability_path": Path(
+    #                 r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\Movie_Lens\louvain_communities\communities_csv\community_0_users_probabilities.csv"
+    #             ),
+    #             "request_path": Path(
+    #                 r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\com\request\requests_com_0.csv"
+    #             ),
+    #         },
+    #     {
+    #         "name": "community_1",
+    #         "probability_path": Path(
+    #             r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\Movie_Lens\louvain_communities\communities_csv\community_1_users_probabilities.csv"
+    #         ),
+    #         "request_path": Path(
+    #             r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\com\request\requests_com_1.csv"
+    #         ),
+    #     },
+    #     {
+    #             "name": "community_4",
+    #             "probability_path": Path(
+    #                 r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\Movie_Lens\louvain_communities\communities_csv\community_4_users_probabilities.csv"
+    #             ),
+    #             "request_path": Path(
+    #                 r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\com\request\requests_com_4.csv"
+    #             ),
+    #         },
+    #         {
+    #             "name": "community_5",
+    #             "probability_path": Path(
+    #                 r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\Movie_Lens\louvain_communities\communities_csv\community_5_users_probabilities.csv"
+    #             ),
+    #             "request_path": Path(
+    #                 r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\com\request\requests_com_5.csv"
+    #             ),
+    #         },
+    #         {
+    #                 "name": "community_6",
+    #                 "probability_path": Path(
+    #                     r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\Movie_Lens\louvain_communities\communities_csv\community_6_users_probabilities.csv"
+    #                 ),
+    #                 "request_path": Path(
+    #                     r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\com\request\requests_com_6.csv"
+    #                 ),
+    #             },
+    #             {
+    #                 "name": "community_7",
+    #                 "probability_path": Path(
+    #                     r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\Movie_Lens\louvain_communities\communities_csv\community_7_users_probabilities.csv"
+    #                 ),
+    #                 "request_path": Path(
+    #                     r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\com\request\requests_com_7.csv"
+    #                 ),
+    #             },
+        {
+                "name": "community_8",
+                "probability_path": Path(
+                    r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\Movie_Lens\louvain_communities\communities_csv\community_8_users_probabilities.csv"
+                ),
+                "request_path": Path(
+                    r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\com\request\requests_com_8.csv"
+                ),
+            },
+        #     {
+        #         "name": "community_9",
+        #         "probability_path": Path(
+        #             r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\Movie_Lens\louvain_communities\communities_csv\community_9_users_probabilities.csv"
+        #         ),
+        #         "request_path": Path(
+        #             r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\com\request\requests_com_9.csv"
+        #         ),
+        #     },
 
-    # Add the other communities here
+
 ]
 
 OUTPUT_DIRECTORY = Path(

@@ -1,4 +1,5 @@
 import os
+import time
 import numpy as np
 import pandas as pd
 import networkx as nx
@@ -20,23 +21,26 @@ def louvain_from_probability_csv(
     similarity_threshold=0.0,
     output_dir="output_scores/louvain_communities"
 ):
+    total_start_time = time.time()
     os.makedirs(output_dir, exist_ok=True)
 
-    # Read CSV: users as rows, items as columns
+    print("Loading probability CSV...")
+    t0 = time.time()
     df_probs = pd.read_csv(csv_path, index_col=0)
-
-    # Convert probabilities to numpy array
     probs = df_probs.values
-
     n_users = probs.shape[0]
+    print(f"Data loaded in {time.time() - t0:.2f} seconds.")
 
     print("Computing user-user similarity...")
+    t0 = time.time()
     sim_matrix = cosine_similarity(probs)
+    print(f"Similarity computed in {time.time() - t0:.2f} seconds.")
 
-    G = nx.Graph()
-    G.add_nodes_from(range(n_users))
 
     print("Building user-user graph...")
+    t0 = time.time()
+    G = nx.Graph()
+    G.add_nodes_from(range(n_users))
 
     for u in range(n_users):
         similarities = sim_matrix[u].copy()
@@ -50,15 +54,19 @@ def louvain_from_probability_csv(
             if sim > similarity_threshold:
                 G.add_edge(u, v, weight=float(sim))
 
+    print(f"Graph built in {time.time() - t0:.2f} seconds.")
     print("Graph nodes:", G.number_of_nodes())
     print("Graph edges:", G.number_of_edges())
 
+
     print("Running Louvain...")
+    t0 = time.time()
     partition = community_louvain.best_partition(
         G,
         weight="weight",
         random_state=42
     )
+    print(f"Louvain completed in {time.time() - t0:.2f} seconds.")
 
     user_communities = np.array([partition[u] for u in range(n_users)])
 
@@ -73,8 +81,9 @@ def louvain_from_probability_csv(
     print("Saved Louvain communities to:", save_path)
     print("Number of communities:", len(np.unique(user_communities)))
     print(df_result["Community"].value_counts().sort_index())
-    
-        # Save one CSV file per community with user probabilities
+
+    print("Exporting community CSVs...")
+    t0 = time.time()
     communities_csv_dir = os.path.join(output_dir, "communities_csv")
     os.makedirs(communities_csv_dir, exist_ok=True)
 
@@ -93,15 +102,20 @@ def louvain_from_probability_csv(
 
         print(f"Saved community {comm_id} CSV: {csv_save_path}")
 
+    print(f"CSVs exported in {time.time() - t0:.2f} seconds.")
+
+    # Total Runtime
+    elapsed_time = time.time() - total_start_time
+    print(f"\nTotal execution time: {elapsed_time:.2f} seconds ({elapsed_time / 60:.2f} minutes)")
+
     return user_communities
 
 
-# Example call
 csv_path = r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\Movie_Lens\user_item_probabilities_1000.csv"
 
 user_communities = louvain_from_probability_csv(
     csv_path=csv_path,
     top_k_neighbors=20,
     similarity_threshold=0.0,
-    output_dir=r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\Movie_Lens\louvain_communities"
+    output_dir=r"C:\Users\User\Desktop\THESIS\LightGCN_movieLens\Shared\Movie_Lens\louvain_communities_2"
 )
